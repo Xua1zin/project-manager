@@ -30,7 +30,7 @@ public class ProjetoController {
     }
 
     @PostMapping("/save")
-    public String saveProjeto(@ModelAttribute("projeto") Projeto projeto) {
+    public String save(@ModelAttribute("projeto") Projeto projeto) {
         projetoService.save(projeto);
         return "redirect:/projeto/list";
     }
@@ -43,20 +43,20 @@ public class ProjetoController {
     }
 
     @GetMapping("/edit/{id}")
-    public String editProjetoForm(@PathVariable("id") Long id, Model model) {
+    public String update(@PathVariable("id") Long id, Model model) {
         Projeto projeto = projetoService.findById(id);
         model.addAttribute("projeto", projeto);
         return "projeto/form";
     }
 
     @PostMapping("/update/{id}")
-    public String updateProjeto(@PathVariable("id") Long id, @ModelAttribute("projeto") Projeto projeto) {
+    public String update(@PathVariable("id") Long id, @ModelAttribute("projeto") Projeto projeto) {
         projetoService.update(projeto, id);
         return "redirect:/projeto/list";
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteProjeto(@PathVariable("id") Long id) {
+    public String delete(@PathVariable("id") Long id) {
         projetoService.delete(id);
         return "redirect:/projeto/list";
     }

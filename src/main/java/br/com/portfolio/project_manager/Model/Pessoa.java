@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -19,13 +19,13 @@ public class Pessoa {
     @Size(min = 2, max = 100, message = "O nome não pode ter menos que 2 caracteres e mais que 100")
     private String nome;
 
-    private Date dataNascimento;
+    private LocalDate dataNascimento;
 
     private String cpf;
 
-    private boolean funcionario;
+    private boolean funcionario = false;
 
-    private boolean gerente;
+    private boolean gerente = false;
 
     @OneToMany(mappedBy = "gerente")
     private List<Projeto> projetosGerenciados;
@@ -41,7 +41,7 @@ public class Pessoa {
     public Pessoa(){
     }
 
-    public Pessoa(Long id, String nome, Date dataNascimento, String cpf, boolean funcionario, boolean gerente, List<Projeto> projetosGerenciados, List<Projeto> projetos) {
+    public Pessoa(Long id, String nome, LocalDate dataNascimento, String cpf, boolean funcionario, boolean gerente, List<Projeto> projetosGerenciados, List<Projeto> projetos) {
         this.id = id;
         this.nome = nome;
         this.dataNascimento = dataNascimento;
@@ -60,7 +60,7 @@ public class Pessoa {
         return nome;
     }
 
-    public Date getDataNascimento() {
+    public LocalDate getDataNascimento() {
         return dataNascimento;
     }
 
@@ -92,7 +92,7 @@ public class Pessoa {
         this.nome = nome;
     }
 
-    public void setDataNascimento(Date dataNascimento) {
+    public void setDataNascimento(LocalDate dataNascimento) {
         this.dataNascimento = dataNascimento;
     }
 

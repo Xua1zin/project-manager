@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Projetos</title>
+</head>
+<body>
+<h1>Projetos</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Nome</th>
+        <th>Status</th>
+        <th>Orçamento</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="projeto : ${projetos}">
+        <td th:text="${projeto.nome}"></td>
+        <td th:text="${projeto.status}"></td>
+        <td th:text="${projeto.orcamento}"></td>
+        <td>
+            <button><a th:href="@{/projeto/{id}(id=${projeto.id})}">Ver Detalhes</a></button>
+            <button><a th:href="@{/projeto/edit/{id}(id=${projeto.id})}">Editar</a></button>
+            <button><a th:href="@{/projeto/delete/{id}(id=${projeto.id})}" onclick="return confirm('Tem certeza que deseja excluir?')">Excluir</a></button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<button><a href="/projeto/new">Novo Projeto</a></button>
+</body>
+</html>

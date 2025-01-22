@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Projeto</title>
+</head>
+<body>
+<h1 th:text="${projeto.id != null ? 'Editar Projeto: ' + projeto.nome : 'Novo Projeto'}"></h1>
+
+<form th:action="${projeto.id != null ? '/projeto/update/' + projeto.id : '/projeto/save'}" th:object="${projeto}" method="post">
+    <div>
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" th:field="*{nome}" required />
+    </div>
+    <div>
+        <label for="dataInicio">Data de Início</label>
+        <input id="dataInicio" th:field="*{dataInicio}" required />
+    </div>
+    <div>
+        <label for="dataPrevisaoFim">Data de Previsão de Término</label>
+        <input id="dataPrevisaoFim" th:field="*{dataPrevisaoFim}" required />
+    </div>
+    <div>
+        <label for="orcamento">Orçamento</label>
+        <input id="orcamento" th:field="*{orcamento}" required />
+    </div>
+    <div>
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" th:field="*{descricao}" required></textarea>
+    </div>
+    <div>
+        <label for="status">Status</label>
+        <select id="status" th:field="*{status}" required>
+            <option value="EM_ANALISE">Em Análise</option>
+            <option value="ANALISE_REALIZADA">Análise Realizada</option>
+            <option value="ANALISE_APROVADA">Análise Aprovada</option>
+            <option value="INICIADO">Iniciado</option>
+            <option value="EM_ANDAMENTO">Em Andamento</option>
+            <option value="ENCERRADO">Encerrado</option>
+        </select>
+    </div>
+    <div>
+        <label for="gerente">Gerente</label>
+        <select id="gerente" th:field="*{gerente}" required />
+        <option value="" disabled selected>Selecione o gerente</option>
+        <option th:each="gerente : ${gerentes}" th:value="${pessoa.id}" th:text="${pessoa.nome}"></option>
+        </select>
+    </div>
+    <div>
+        <label for="pessoas">Membros</label>
+        <select id="pessoas" th:field="*{pessoas}" required />
+        <option value="" disabled selected>Selecione o gerente</option>
+        <option th:each="pessoa : ${pessoas}" th:value="${pessoa.id}" th:text="${pessoa.nome}"></option>
+        </select>
+    </div>
+    <div>
+        <button type="submit">Salvar</button>
+    </div>
+</form>
+<button><a href="/projeto/list">Voltar</a></button>
+</body>
+</html>

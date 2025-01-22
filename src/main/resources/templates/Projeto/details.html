@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Projeto</title>
+</head>
+<body>
+<h1>Detalhes do Projeto</h1>
+<p><strong>Nome:</strong> <span th:text="${projeto.nome}"></span></p>
+<p><strong>Descrição:</strong> <span th:text="${projeto.descricao}"></span></p>
+<p><strong>Data de Início:</strong> <span th:text="${projeto.dataInicio}"></span></p>
+<p><strong>Data de Previsão de Término:</strong> <span th:text="${projeto.dataPrevisaoFim}"></span></p>
+<p><strong>Orçamento:</strong> <span th:text="${projeto.orcamento}"></span></p>
+<p><strong>Status:</strong> <span th:text="${projeto.status}"></span></p>
+<p><strong>Gerente:</strong> <span th:text="${projeto.gerente}"></span></p>
+
+<button><a href="/projeto/edit/{id}" th:href="@{/projeto/edit/{id}(id=${projeto.id})}">Editar</a></button>
+<button><a href="/projeto/list">Voltar</a></button>
+</body>
+</html>
