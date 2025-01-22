@@ -24,4 +24,24 @@ public class PessoaService {
             throw new RuntimeException("Error saving person: " + e.getMessage());
         }
     }
+
+    public String delete(Long id){
+        try{
+            Pessoa pessoa = pessoaRepository.findById(id)
+                    .orElseThrow(PessoaNotFoundException::new);
+
+            if(pessoa.getProjetos() != null || pessoa.getProjetosGerenciados() != null){
+                throw new ValidationException("People who are linked to project cannot be deleted");
+            }
+
+            pessoaRepository.deleteById(id);
+
+            return "Person successfully deleted";
+        } catch (PessoaNotFoundException | ValidationException e){
+            throw e;
+        }catch (Exception e){
+            throw new RuntimeException("Error deleting person: " + e.getMessage());
+        }
+    }
+
 }
