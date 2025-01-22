@@ -14,6 +14,7 @@ import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 //O sistema deve permitir o cadastro (inserção, exclusão, alteração e consulta) de projetos. Para cada
 //projeto devem ser informados: nome, data de início, gerente responsável, previsão de término, data real de
@@ -79,7 +80,8 @@ public class ProjetoService {
             Projeto existingProjeto = projetoRepository.findById(id)
                     .orElseThrow(ProjetoNotFoundException :: new);
 
-            //Não diz nas regras de negócio passadas pelo escopo, mas deixarei que não pode mudar data de inicio nem a de fim.
+            //Não diz nas regras de negócio passadas pelo escopo, mas deixarei que não pode mudar data de inicio nem a de fim,
+            //nem adicionar Membros, já que tem uma função somente para isso.
             existingProjeto.setNome(projeto.getNome());
             existingProjeto.setDataPrevisaoFim(projeto.getDataPrevisaoFim());
             existingProjeto.setOrcamento(projeto.getOrcamento());
@@ -87,7 +89,6 @@ public class ProjetoService {
             existingProjeto.setDescricao(projeto.getDescricao());
             existingProjeto.setGerente(projeto.getGerente());
             existingProjeto.setRisco(projeto.getRisco());
-            existingProjeto.setMembros(projeto.getMembros());
 
             projetoRepository.save(existingProjeto);
 
@@ -116,6 +117,44 @@ public class ProjetoService {
             throw e;
         } catch (Exception e){
             throw new RuntimeException("Error finding project: " + e.getMessage());
+        }
+    }
+
+    public String addMembrosToProjeto(List<Long> idPessoa, Long idProjeto){
+        try{
+            List<Pessoa> pessoas = pessoaRepository.findAllById(idPessoa);
+
+            //retorna todos os IDs que não existem como um erro, caso o tamanho da lista de consulta e da lista recebida forem
+            //diferentes
+            if (pessoas.size() != idPessoa.size()) {
+                List<Long> foundIds = pessoas.stream().map(Pessoa::getId).collect(Collectors.toList());
+                List<Long> notFoundIds = idPessoa.stream()
+                        .filter(id -> !foundIds.contains(id))
+                        .collect(Collectors.toList());
+                throw new PessoaNotFoundException();
+            }
+
+            //Filtro que verifica se a pessoa é funcionária
+            List<Pessoa> pessoaList = pessoas.stream()
+                    .filter(Pessoa::isFuncionario)
+                    .collect(Collectors.toList());
+
+            if (pessoaList.isEmpty()) {
+                throw new RuntimeException("No valid employees found in the provided list.");
+            }
+
+            Projeto projeto = projetoRepository.findById(idProjeto)
+                    .orElseThrow(ProjetoNotFoundException :: new);
+
+            projeto.setMembros(pessoaList);
+
+            projetoRepository.save(projeto);
+
+            return "Membros added to Projeto successfully";
+        } catch (PessoaNotFoundException | ProjetoNotFoundException e){
+            throw e;
+        } catch (Exception e){
+            throw new RuntimeException("Error vinculating Membros to Projeto: " + e.getMessage());
         }
     }
 }

@@ -1,11 +1,13 @@
 package br.com.portfolio.project_manager.Service;
 
+import br.com.portfolio.project_manager.Exception.Pessoa.PessoaNotFoundException;
 import br.com.portfolio.project_manager.Exception.Projeto.ProjetoNotFoundException;
 import br.com.portfolio.project_manager.Model.Enum.Risco;
 import br.com.portfolio.project_manager.Model.Enum.Status;
 import br.com.portfolio.project_manager.Model.Pessoa;
 import br.com.portfolio.project_manager.Model.Projeto;
 import br.com.portfolio.project_manager.ProjectManagerApplication;
+import br.com.portfolio.project_manager.Repository.PessoaRepository;
 import br.com.portfolio.project_manager.Repository.ProjetoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +35,9 @@ class ProjetoServiceTest {
 
     @Mock
     ProjetoRepository projetoRepository;
+
+    @Mock
+    PessoaRepository pessoaRepository;
 
 
     @BeforeEach
@@ -294,5 +296,160 @@ class ProjetoServiceTest {
 
         assertEquals("Error finding project: Database error", exception.getMessage());
         verify(projetoRepository, times(1)).findById(1L);
+    }
+
+    //=======================TESTES DE ADIÇÃO DE MEMBROS NO PROJETO=======================
+    @Test
+    void addMembrosToProjetoSuccess(){
+        List<Long> idPessoas = Arrays.asList(2L, 3L);
+
+        Pessoa pessoa1 = new Pessoa();
+        pessoa1.setId(2L);
+        pessoa1.setFuncionario(true);
+
+        Pessoa pessoa2 = new Pessoa();
+        pessoa2.setId(3L);
+        pessoa2.setFuncionario(true);
+
+        List<Pessoa> pessoas = Arrays.asList(pessoa1, pessoa2);
+
+        Projeto projeto = new Projeto();
+        projeto.setId(1L);
+        projeto.setMembros(Collections.emptyList());
+
+        when(pessoaRepository.findAllById(idPessoas)).thenReturn(pessoas);
+        when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
+        when(projetoRepository.save(any(Projeto.class))).thenReturn(projeto);
+
+        String result = projetoService.addMembrosToProjeto(idPessoas, projeto.getId());
+
+        assertEquals("Membros added to Projeto successfully", result);
+        assertEquals(2, projeto.getMembros().size());
+        assertTrue(projeto.getMembros().contains(pessoa1));
+        assertTrue(projeto.getMembros().contains(pessoa2));
+
+        verify(projetoRepository).save(projeto);
+    }
+
+    @Test
+    void addMembrosToProjectNoValidEmployee(){
+        List<Long> idPessoas = Arrays.asList(2L, 3L);
+
+        Pessoa pessoa1 = new Pessoa();
+        pessoa1.setId(2L);
+        pessoa1.setFuncionario(false);
+
+        Pessoa pessoa2 = new Pessoa();
+        pessoa2.setId(3L);
+        pessoa2.setFuncionario(false);
+
+        List<Pessoa> pessoas = Arrays.asList(pessoa1, pessoa2);
+
+        when(pessoaRepository.findAllById(idPessoas)).thenReturn(pessoas);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            projetoService.addMembrosToProjeto(idPessoas, 1L);
+        });
+
+        assertEquals("Error vinculating Membros to Projeto: No valid employees found in the provided list.", exception.getMessage());
+        verify(projetoRepository, never()).save(any(Projeto.class));
+    }
+
+    @Test
+    void addMembrosToProjetoProjetoNotFound(){
+        List<Long> idPessoas = Arrays.asList(2L);
+
+        Pessoa pessoa = new Pessoa();
+        pessoa.setId(2L);
+        pessoa.setFuncionario(true);
+
+        when(pessoaRepository.findAllById(idPessoas)).thenReturn(Collections.singletonList(pessoa));
+        when(projetoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        ProjetoNotFoundException exception = assertThrows(ProjetoNotFoundException.class, () -> {
+            projetoService.addMembrosToProjeto(idPessoas, 1L);
+        });
+
+        assertNotNull(exception);
+        verify(projetoRepository, never()).save(any(Projeto.class));
+    }
+
+    @Test
+    void addMembrosToProjetoException(){
+        List<Long> idPessoas = Arrays.asList(2L);
+
+        Pessoa pessoa = new Pessoa();
+        pessoa.setId(2L);
+        pessoa.setFuncionario(true);
+
+        Projeto projeto = new Projeto();
+        projeto.setId(1L);
+        projeto.setMembros(Collections.emptyList());
+
+        when(pessoaRepository.findAllById(idPessoas)).thenReturn(Collections.singletonList(pessoa));
+        when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
+        when(projetoRepository.save(any(Projeto.class))).thenThrow(new RuntimeException("Database error"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            projetoService.addMembrosToProjeto(idPessoas, 1L);
+        });
+
+        assertEquals("Error vinculating Membros to Projeto: Database error", exception.getMessage());
+    }
+
+    @Test
+    void addMembrosToProjetoOnlyOneEmployee(){
+        List<Long> idPessoas = Arrays.asList(2L, 3L);
+
+        Pessoa pessoa1 = new Pessoa();
+        pessoa1.setId(2L);
+        pessoa1.setFuncionario(false);
+
+        Pessoa pessoa2 = new Pessoa();
+        pessoa2.setId(3L);
+        pessoa2.setFuncionario(true);
+
+        List<Pessoa> pessoas = Arrays.asList(pessoa1, pessoa2);
+
+        Projeto projeto = new Projeto();
+        projeto.setId(1L);
+        projeto.setMembros(Collections.emptyList());
+
+        when(pessoaRepository.findAllById(idPessoas)).thenReturn(pessoas);
+        when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
+        when(projetoRepository.save(any(Projeto.class))).thenReturn(projeto);
+
+        String result = projetoService.addMembrosToProjeto(idPessoas, projeto.getId());
+
+        assertEquals("Membros added to Projeto successfully", result);
+        assertEquals(1, projeto.getMembros().size());
+        assertFalse(projeto.getMembros().contains(pessoa1));
+        assertTrue(projeto.getMembros().contains(pessoa2));
+
+        verify(projetoRepository).save(projeto);
+    }
+
+    @Test
+    void addMembrosToProjetoNoExistentId(){
+        List<Long> idPessoas = Arrays.asList(2L, 3L);
+
+        Pessoa pessoa1 = new Pessoa();
+        pessoa1.setId(2L);
+        pessoa1.setFuncionario(true);
+
+        List<Pessoa> pessoas = Collections.singletonList(pessoa1);
+
+        Projeto projeto = new Projeto();
+        projeto.setId(1L);
+        projeto.setMembros(Collections.emptyList());
+
+        when(pessoaRepository.findAllById(idPessoas)).thenReturn(pessoas);
+        when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
+
+        RuntimeException exception = assertThrows(PessoaNotFoundException.class,
+                () -> projetoService.addMembrosToProjeto(idPessoas, projeto.getId())
+        );
+
+        verify(projetoRepository, never()).save(any(Projeto.class));
     }
 }
