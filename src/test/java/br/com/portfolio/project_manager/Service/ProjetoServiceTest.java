@@ -1,7 +1,9 @@
 package br.com.portfolio.project_manager.Service;
 
 import br.com.portfolio.project_manager.Exception.Projeto.ProjetoNotFoundException;
+import br.com.portfolio.project_manager.Model.Enum.Risco;
 import br.com.portfolio.project_manager.Model.Enum.Status;
+import br.com.portfolio.project_manager.Model.Pessoa;
 import br.com.portfolio.project_manager.Model.Projeto;
 import br.com.portfolio.project_manager.ProjectManagerApplication;
 import br.com.portfolio.project_manager.Repository.ProjetoRepository;
@@ -147,6 +149,73 @@ class ProjetoServiceTest {
         assertEquals("Error deleting project: Database error", exception.getMessage());
 
         verify(projetoRepository, never()).deleteById(1L);
+    }
+
+    //=======================TESTES DE UPDATE=======================
+    @Test
+    void updateSuccess(){
+        Projeto projeto = new Projeto();
+        projeto.setId(1L);
+        projeto.setNome("projeto");
+        projeto.setDataInicio(LocalDate.from(of(2025, 1, 1)));
+        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataFim(null);
+        projeto.setDescricao("Descrição do projeto");
+        projeto.setOrcamento(1000f);
+        projeto.setRisco(Risco.ALTO);
+        projeto.setStatus(Status.EM_ANALISE);
+        projeto.setGerente(new Pessoa());
+        projeto.setMembros(null);
+
+        Projeto projetoAtualizado = new Projeto();
+        projetoAtualizado.setNome("Projeto Teste Atualizado");
+        projetoAtualizado.setDataInicio(LocalDate.from(of(2025, 1, 1)));
+        projetoAtualizado.setDataPrevisaoFim(LocalDate.from(of(2025, 2, 15)));
+        projetoAtualizado.setDataFim(null);
+        projetoAtualizado.setDescricao("Descrição do projeto atualizada");
+        projetoAtualizado.setOrcamento(7000f);
+        projetoAtualizado.setRisco(Risco.BAIXO);
+        projetoAtualizado.setStatus(Status.ANALISE_REALIZADA);
+        projetoAtualizado.setGerente(new Pessoa());
+        projetoAtualizado.setMembros(null);
+
+        when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
+
+        when(projetoRepository.save(any(Projeto.class))).thenReturn(projetoAtualizado);
+
+        String result = projetoService.update(projetoAtualizado, projeto.getId());
+
+        assertEquals("Project updated successfully", result);
+
+        verify(projetoRepository).save(any(Projeto.class));
+
+        assertEquals("Projeto Teste Atualizado", projetoAtualizado.getNome());
+        assertEquals(LocalDate.from(of(2025, 2, 15)), projetoAtualizado.getDataPrevisaoFim());
+        assertEquals(7000f, projetoAtualizado.getOrcamento());
+        assertEquals("Descrição do projeto atualizada", projetoAtualizado.getDescricao());
+    }
+
+    @Test
+    void UpdateProjetoNotFound() {
+        Projeto projetoAtualizado = new Projeto();
+
+        when(projetoRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(ProjetoNotFoundException.class, () -> projetoService.update(projetoAtualizado, 1L));
+
+        verify(projetoRepository, never()).save(any(Projeto.class));
+    }
+
+    @Test
+    void testUpdateException() {
+        Projeto projeto = new Projeto();
+        Projeto projetoAtualizado = new Projeto();
+
+        when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
+
+        when(projetoRepository.save(any(Projeto.class))).thenThrow(new RuntimeException("Unexpected error"));
+
+        assertThrows(RuntimeException.class, () -> projetoService.update(projetoAtualizado, 1L));
     }
 
     //=======================TESTES DE CONSULTA=======================
