@@ -2,6 +2,7 @@ package br.com.portfolio.project_manager.Service;
 
 import br.com.portfolio.project_manager.Exception.Pessoa.PessoaNotFoundException;
 import br.com.portfolio.project_manager.Exception.Projeto.ProjetoNotFoundException;
+import br.com.portfolio.project_manager.Model.Enum.Risco;
 import br.com.portfolio.project_manager.Model.Enum.Status;
 import br.com.portfolio.project_manager.Model.Pessoa;
 import br.com.portfolio.project_manager.Model.Projeto;
@@ -11,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 //O sistema deve permitir o cadastro (inserção, exclusão, alteração e consulta) de projetos. Para cada
@@ -41,6 +40,7 @@ public class ProjetoService {
 
             //Toda vez que um projeto for criado, ele começa do status inicial, no caso "Em análise"
             projeto.setStatus(Status.EM_ANALISE);
+            projeto.setRisco(calculateRisco(projeto));
             projetoRepository.save(projeto);
 
             return "Project created successfully";
@@ -88,7 +88,7 @@ public class ProjetoService {
             existingProjeto.setStatus(projeto.getStatus());
             existingProjeto.setDescricao(projeto.getDescricao());
             existingProjeto.setGerente(projeto.getGerente());
-            existingProjeto.setRisco(projeto.getRisco());
+            existingProjeto.setRisco(calculateRisco(existingProjeto));
 
             projetoRepository.save(existingProjeto);
 
@@ -124,13 +124,9 @@ public class ProjetoService {
         try{
             List<Pessoa> pessoas = pessoaRepository.findAllById(idPessoa);
 
-            //retorna todos os IDs que não existem como um erro, caso o tamanho da lista de consulta e da lista recebida forem
-            //diferentes
+            //retorna erro de pessoa não encontrada por Ids não encontrados
             if (pessoas.size() != idPessoa.size()) {
-                List<Long> foundIds = pessoas.stream().map(Pessoa::getId).collect(Collectors.toList());
-                List<Long> notFoundIds = idPessoa.stream()
-                        .filter(id -> !foundIds.contains(id))
-                        .collect(Collectors.toList());
+                List<Long> foundIds = pessoas.stream().map(Pessoa::getId).toList();
                 throw new PessoaNotFoundException();
             }
 
@@ -155,6 +151,16 @@ public class ProjetoService {
             throw e;
         } catch (Exception e){
             throw new RuntimeException("Error vinculating Membros to Projeto: " + e.getMessage());
+        }
+    }
+
+    private Risco calculateRisco(Projeto projeto) {
+        if (projeto.getOrcamento() > 50000) {
+            return Risco.ALTO;
+        } else if (projeto.getOrcamento() > 20000) {
+            return Risco.MEDIO;
+        } else {
+            return Risco.BAIXO;
         }
     }
 }

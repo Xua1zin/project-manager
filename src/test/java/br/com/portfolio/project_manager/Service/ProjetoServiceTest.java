@@ -52,7 +52,24 @@ class ProjetoServiceTest {
         projeto.setNome("projeto");
         projeto.setDataInicio(LocalDate.of(2025, 1, 1));
         projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
-        projeto.setOrcamento(5000f);
+        projeto.setOrcamento(100000f);
+        projeto.setStatus(Status.EM_ANALISE);
+
+        when(projetoRepository.save(projeto)).thenReturn(projeto);
+        String result = projetoService.save(projeto);
+
+        assertEquals("Project created successfully", result);
+        verify(projetoRepository, times(1)).save(projeto);
+    }
+
+    //Teste feito para cobrir o calculateRisco
+    @Test
+    void saveSuccess2() {
+        Projeto projeto = new Projeto();
+        projeto.setNome("projeto");
+        projeto.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setOrcamento(50000f);
         projeto.setStatus(Status.EM_ANALISE);
 
         when(projetoRepository.save(projeto)).thenReturn(projeto);
