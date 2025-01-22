@@ -44,4 +44,23 @@ public class PessoaService {
         }
     }
 
+    public String update(Pessoa pessoa, Long id){
+        try {
+            Pessoa existingPessoa = pessoaRepository.findById(id)
+                    .orElseThrow(PessoaNotFoundException::new);
+
+            existingPessoa.setNome(pessoa.getNome());
+            existingPessoa.setCpf(pessoa.getCpf());
+            existingPessoa.setDataNascimento(pessoa.getDataNascimento());
+            existingPessoa.setGerente(pessoa.isGerente());
+            existingPessoa.setFuncionario(pessoa.isFuncionario());
+
+            pessoaRepository.save(existingPessoa);
+            return "Person successfully updated";
+        } catch (PessoaNotFoundException e){
+            throw e;
+        }catch (Exception e){
+            throw new RuntimeException("Error updating person: " + e.getMessage());
+        }
+    }
 }

@@ -2,6 +2,7 @@ package br.com.portfolio.project_manager.Service;
 
 import br.com.portfolio.project_manager.Exception.Pessoa.PessoaNotFoundException;
 import br.com.portfolio.project_manager.Model.Pessoa;
+import br.com.portfolio.project_manager.Model.Projeto;
 import br.com.portfolio.project_manager.Repository.PessoaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -112,4 +113,69 @@ class PessoaServiceTest {
     }
 
     //=======================TESTES DE UPDATE=======================
+    @Test
+    public void updateSuccess() {
+        Pessoa pessoa = new Pessoa();
+        pessoa.setId(1L);
+        pessoa.setNome("João");
+        pessoa.setCpf("12345678900");
+        pessoa.setDataNascimento(LocalDate.of(1995, 5, 10));
+        pessoa.setGerente(false);
+        pessoa.setFuncionario(true);
+
+        Pessoa updatedPessoa = new Pessoa();
+        updatedPessoa.setNome("Carlos");
+        updatedPessoa.setCpf("09876543211");
+        updatedPessoa.setDataNascimento(LocalDate.of(1992, 3, 20));
+        updatedPessoa.setGerente(true);
+        updatedPessoa.setFuncionario(true);
+
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
+        when(pessoaRepository.save(any(Pessoa.class))).thenReturn(updatedPessoa);
+
+        String response = pessoaService.update(updatedPessoa, 1L);
+
+        assertEquals("Person successfully updated", response);
+        assertEquals("Carlos", pessoa.getNome());
+        assertEquals("09876543211", pessoa.getCpf());
+
+        verify(pessoaRepository, times(1)).findById(1L);
+        verify(pessoaRepository, times(1)).save(pessoa);
+    }
+
+    @Test
+    public void updatePessoaNotFound() {
+        Pessoa updatedPessoa = new Pessoa();
+
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(PessoaNotFoundException.class, () -> pessoaService.update(updatedPessoa, 1L));
+
+        verify(pessoaRepository, never()).save(updatedPessoa);
+    }
+
+    @Test
+    public void updateException() {
+        Pessoa pessoa = new Pessoa();
+        pessoa.setId(1L);
+        pessoa.setNome("João");
+        pessoa.setCpf("12345678900");
+        pessoa.setDataNascimento(LocalDate.of(1995, 5, 10));
+        pessoa.setGerente(false);
+        pessoa.setFuncionario(true);
+
+        Pessoa updatedPessoa = new Pessoa();
+        updatedPessoa.setNome("Carlos");
+        updatedPessoa.setCpf("09876543211");
+        updatedPessoa.setDataNascimento(LocalDate.of(1992, 3, 20));
+        updatedPessoa.setGerente(true);
+        updatedPessoa.setFuncionario(true);
+
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
+        when(pessoaRepository.save(any(Pessoa.class))).thenThrow(new RuntimeException("Database error"));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> pessoaService.update(updatedPessoa, 1L));
+        assertEquals("Error updating person: Database error", thrown.getMessage());
+        verify(pessoaRepository, never()).save(updatedPessoa);
+    }
 }
