@@ -474,6 +474,7 @@ class ProjetoServiceTest {
     }
 
     //=======================TESTES PARA VERIFICAÇÃO DO isStatusTransitionValid=======================
+    //Quase me matei fazendo esses testes :D
     @Test
     void testValidStatusTransitions() {
         Long id = 1L;

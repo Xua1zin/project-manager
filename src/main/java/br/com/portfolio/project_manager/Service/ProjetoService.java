@@ -74,7 +74,6 @@ public class ProjetoService {
         }
     }
 
-    //Vai sofrer alterações futuramente por causa dos membros e gerente.
     public String update(Projeto projeto, Long id){
         try {
             Projeto existingProjeto = projetoRepository.findById(id)
