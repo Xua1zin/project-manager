@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -21,13 +23,12 @@ public class Projeto {
     private String nome;
 
     @NotNull
-    private Date dataInicio;
+    private LocalDate dataInicio;
 
     @NotNull
-    private Date dataPrevisaoFim;
+    private LocalDate dataPrevisaoFim;
 
-    @NotNull
-    private Date dataFim;
+    private Instant dataFim;
 
     @Size(min = 10, max = 5000, message = "A descrição não pode ter mais que 5000 caracteres")
     private String descricao;
@@ -53,7 +54,7 @@ public class Projeto {
     public Projeto() {
     }
 
-    public Projeto(Long id, String nome, Date dataInicio, Date dataPrevisaoFim, Date dataFim, String descricao, Status status, Float orcamento, Risco risco, Pessoa gerente, List<Pessoa> membros) {
+    public Projeto(Long id, String nome, LocalDate dataInicio, LocalDate dataPrevisaoFim, Instant dataFim, String descricao, Status status, Float orcamento, Risco risco, Pessoa gerente, List<Pessoa> membros) {
         this.id = id;
         this.nome = nome;
         this.dataInicio = dataInicio;
@@ -75,15 +76,15 @@ public class Projeto {
         return nome;
     }
 
-    public Date getDataInicio() {
+    public LocalDate getDataInicio() {
         return dataInicio;
     }
 
-    public Date getDataPrevisaoFim() {
+    public LocalDate getDataPrevisaoFim() {
         return dataPrevisaoFim;
     }
 
-    public Date getDataFim() {
+    public Instant getDataFim() {
         return dataFim;
     }
 
@@ -119,15 +120,15 @@ public class Projeto {
         this.nome = nome;
     }
 
-    public void setDataInicio(Date dataInicio) {
+    public void setDataInicio(LocalDate dataInicio) {
         this.dataInicio = dataInicio;
     }
 
-    public void setDataPrevisaoFim(Date dataPrevisaoFim) {
+    public void setDataPrevisaoFim(LocalDate dataPrevisaoFim) {
         this.dataPrevisaoFim = dataPrevisaoFim;
     }
 
-    public void setDataFim(Date dataFim) {
+    public void setDataFim(Instant dataFim) {
         this.dataFim = dataFim;
     }
 

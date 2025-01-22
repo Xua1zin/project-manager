@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.ValidationException;
+import java.util.Optional;
 
 //[ ] O sistema deve permitir o cadastro (inserção, exclusão, alteração e consulta) de projetos. Para cada
 //projeto devem ser informados: nome, data de início, gerente responsável, previsão de término, data real de
@@ -18,7 +19,7 @@ public class ProjetoService {
 
     public String save(Projeto projeto){
         try{
-            if (projeto.getDataInicio().after(projeto.getDataPrevisaoFim())) {
+            if (projeto.getDataInicio().isAfter(projeto.getDataPrevisaoFim())) {
                 throw new ValidationException("A data de início não pode ser após a data de previsão de término.");
             }
 
@@ -34,6 +35,26 @@ public class ProjetoService {
             throw e;
         } catch (Exception e){
             throw new RuntimeException("Error registering project: " + e.getMessage());
+        }
+    }
+    //Se um projeto foi mudado o status para iniciado, em andamento ou encerrado não
+    //pode mais ser excluído
+    public String delete(Long id){
+        try{
+            Projeto projeto = projetoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Project not found"));
+            Status status = projeto.getStatus();
+
+            if(status.equals(Status.INICIADO) || status.equals(Status.EM_ANDAMENTO) || status.equals(Status.ENCERRADO)){
+                throw new ValidationException("Projects that already have started or finished cannot be deleted.");
+            }
+
+            projetoRepository.deleteById(projeto.getId());
+            return "Project deleted successfully";
+        } catch (ValidationException e){
+            throw e;
+        } catch (Exception e){
+            throw new RuntimeException("Error deleting project: " + e.getMessage());
         }
     }
 }
