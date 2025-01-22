@@ -30,7 +30,7 @@ public class PessoaService {
             Pessoa pessoa = pessoaRepository.findById(id)
                     .orElseThrow(PessoaNotFoundException::new);
 
-            if(pessoa.getProjetos() != null || pessoa.getProjetosGerenciados() != null){
+            if(!pessoa.getProjetos().isEmpty() || !pessoa.getProjetosGerenciados().isEmpty()){
                 throw new ValidationException("People who are linked to project cannot be deleted");
             }
 
