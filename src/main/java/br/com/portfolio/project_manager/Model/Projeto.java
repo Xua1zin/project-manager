@@ -1,5 +1,6 @@
 package br.com.portfolio.project_manager.Model;
 
+import br.com.portfolio.project_manager.Model.Enum.Risco;
 import br.com.portfolio.project_manager.Model.Enum.Status;
 import jakarta.persistence.*;
 
@@ -19,22 +20,29 @@ public class Projeto {
     @Size(max = 200, message = "O nome não pode ter mais que 100 caracteres")
     private String nome;
 
+    @NotNull
     private Date dataInicio;
 
+    @NotNull
     private Date dataPrevisaoFim;
 
+    @NotNull
     private Date dataFim;
 
-    @Size(max = 5000, message = "A descrição não pode ter mais que 5000 caracteres")
+    @Size(min = 10, max = 5000, message = "A descrição não pode ter mais que 5000 caracteres")
     private String descricao;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @NotNull
     private Float orcamento;
 
-    private String risco;
+    @Enumerated(EnumType.STRING)
+    private Risco risco;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "idgerente", referencedColumnName = "id")
     private Pessoa gerente;
@@ -45,7 +53,7 @@ public class Projeto {
     public Projeto() {
     }
 
-    public Projeto(Long id, String nome, Date dataInicio, Date dataPrevisaoFim, Date dataFim, String descricao, Status status, Float orcamento, String risco, Pessoa gerente, List<Pessoa> membros) {
+    public Projeto(Long id, String nome, Date dataInicio, Date dataPrevisaoFim, Date dataFim, String descricao, Status status, Float orcamento, Risco risco, Pessoa gerente, List<Pessoa> membros) {
         this.id = id;
         this.nome = nome;
         this.dataInicio = dataInicio;
@@ -91,7 +99,7 @@ public class Projeto {
         return orcamento;
     }
 
-    public String getRisco() {
+    public Risco getRisco() {
         return risco;
     }
 
@@ -135,7 +143,7 @@ public class Projeto {
         this.orcamento = orcamento;
     }
 
-    public void setRisco(String risco) {
+    public void setRisco(Risco risco) {
         this.risco = risco;
     }
 
