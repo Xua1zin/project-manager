@@ -2,7 +2,6 @@ package br.com.portfolio.project_manager.Service;
 
 import br.com.portfolio.project_manager.Exception.Pessoa.PessoaNotFoundException;
 import br.com.portfolio.project_manager.Exception.Projeto.ProjetoNotFoundException;
-import br.com.portfolio.project_manager.Model.Enum.Risco;
 import br.com.portfolio.project_manager.Model.Enum.Status;
 import br.com.portfolio.project_manager.Model.Pessoa;
 import br.com.portfolio.project_manager.Model.Projeto;
@@ -14,15 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
-import static java.time.LocalDate.of;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -51,7 +47,7 @@ class ProjetoServiceTest {
         Projeto projeto = new Projeto();
         projeto.setNome("projeto");
         projeto.setDataInicio(LocalDate.of(2025, 1, 1));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setOrcamento(100000f);
         projeto.setStatus(Status.EM_ANALISE);
 
@@ -68,7 +64,7 @@ class ProjetoServiceTest {
         Projeto projeto = new Projeto();
         projeto.setNome("projeto");
         projeto.setDataInicio(LocalDate.of(2025, 1, 1));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setOrcamento(50000f);
         projeto.setStatus(Status.EM_ANALISE);
 
@@ -83,8 +79,8 @@ class ProjetoServiceTest {
     void saveInvalidDataInicio() {
         Projeto projeto = new Projeto();
         projeto.setNome("projeto");
-        projeto.setDataInicio(LocalDate.from(of(2025, 12, 31)));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 1, 1)));
+        projeto.setDataInicio(LocalDate.of(2025, 12, 31));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 1, 1));
         projeto.setOrcamento(5000f);
         projeto.setStatus(Status.EM_ANALISE);
 
@@ -96,8 +92,8 @@ class ProjetoServiceTest {
     void saveInvalidOrcamento() {
         Projeto projeto = new Projeto();
         projeto.setNome("projeto");
-        projeto.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setOrcamento(-100f);
         projeto.setStatus(Status.EM_ANALISE);
 
@@ -120,8 +116,8 @@ class ProjetoServiceTest {
         Projeto projeto = new Projeto();
         projeto.setId(1L);
         projeto.setNome("projeto");
-        projeto.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setOrcamento(4000f);
         projeto.setStatus(Status.EM_ANALISE);
 
@@ -139,8 +135,8 @@ class ProjetoServiceTest {
         Projeto projeto = new Projeto();
         projeto.setId(1L);
         projeto.setNome("projeto");
-        projeto.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setOrcamento(4000f);
         projeto.setStatus(Status.INICIADO);
 
@@ -176,24 +172,22 @@ class ProjetoServiceTest {
         Projeto projeto = new Projeto();
         projeto.setId(1L);
         projeto.setNome("projeto");
-        projeto.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setDataFim(null);
         projeto.setDescricao("Descrição do projeto");
         projeto.setOrcamento(1000f);
-        projeto.setRisco(Risco.ALTO);
         projeto.setStatus(Status.EM_ANALISE);
         projeto.setGerente(new Pessoa());
         projeto.setMembros(null);
 
         Projeto projetoAtualizado = new Projeto();
         projetoAtualizado.setNome("Projeto Teste Atualizado");
-        projetoAtualizado.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projetoAtualizado.setDataPrevisaoFim(LocalDate.from(of(2025, 2, 15)));
+        projetoAtualizado.setDataInicio(LocalDate.of(2025, 1, 1));
+        projetoAtualizado.setDataPrevisaoFim(LocalDate.of(2025, 2, 15));
         projetoAtualizado.setDataFim(null);
         projetoAtualizado.setDescricao("Descrição do projeto atualizada");
         projetoAtualizado.setOrcamento(7000f);
-        projetoAtualizado.setRisco(Risco.BAIXO);
         projetoAtualizado.setStatus(Status.ANALISE_REALIZADA);
         projetoAtualizado.setGerente(new Pessoa());
         projetoAtualizado.setMembros(null);
@@ -209,13 +203,13 @@ class ProjetoServiceTest {
         verify(projetoRepository).save(any(Projeto.class));
 
         assertEquals("Projeto Teste Atualizado", projetoAtualizado.getNome());
-        assertEquals(LocalDate.from(of(2025, 2, 15)), projetoAtualizado.getDataPrevisaoFim());
+        assertEquals(LocalDate.of(2025, 2, 15), projetoAtualizado.getDataPrevisaoFim());
         assertEquals(7000f, projetoAtualizado.getOrcamento());
         assertEquals("Descrição do projeto atualizada", projetoAtualizado.getDescricao());
     }
 
     @Test
-    void UpdateProjetoNotFound() {
+    void updateProjetoNotFound() {
         Projeto projetoAtualizado = new Projeto();
 
         when(projetoRepository.findById(1L)).thenReturn(Optional.empty());
@@ -226,7 +220,7 @@ class ProjetoServiceTest {
     }
 
     @Test
-    void testUpdateException() {
+    void updateException() {
         Projeto projeto = new Projeto();
         Projeto projetoAtualizado = new Projeto();
 
@@ -237,6 +231,21 @@ class ProjetoServiceTest {
         assertThrows(RuntimeException.class, () -> projetoService.update(projetoAtualizado, 1L));
     }
 
+    @Test
+    void updateInvalidStatus(){
+        Projeto projeto = new Projeto();
+        projeto.setId(2L);
+        projeto.setStatus(Status.EM_ANALISE);
+        Projeto projetoAtualizado = new Projeto();
+        projetoAtualizado.setStatus(Status.PLANEJADO);
+
+        when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
+
+        assertThrows(ValidationException.class, () -> projetoService.update(projetoAtualizado, projeto.getId()));
+
+        verify(projetoRepository, never()).save(any(Projeto.class));
+    }
+
     //=======================TESTES DE CONSULTA=======================
     @Test
     void findAllSuccess(){
@@ -244,15 +253,15 @@ class ProjetoServiceTest {
 
         Projeto projeto = new Projeto();
         projeto.setNome("projeto");
-        projeto.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setOrcamento(1000f);
         projeto.setStatus(Status.EM_ANALISE);
 
         Projeto projeto2 = new Projeto();
         projeto2.setNome("projeto2");
-        projeto2.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projeto2.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto2.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto2.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto2.setOrcamento(5000f);
         projeto2.setStatus(Status.EM_ANALISE);
 
@@ -283,8 +292,8 @@ class ProjetoServiceTest {
         Projeto projeto = new Projeto();
         projeto.setId(1L);
         projeto.setNome("projeto");
-        projeto.setDataInicio(LocalDate.from(of(2025, 1, 1)));
-        projeto.setDataPrevisaoFim(LocalDate.from(of(2025, 12, 31)));
+        projeto.setDataInicio(LocalDate.of(2025, 1, 1));
+        projeto.setDataPrevisaoFim(LocalDate.of(2025, 12, 31));
         projeto.setOrcamento(4000f);
         projeto.setStatus(Status.INICIADO);
 
@@ -364,9 +373,7 @@ class ProjetoServiceTest {
 
         when(pessoaRepository.findAllById(idPessoas)).thenReturn(pessoas);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            projetoService.addMembrosToProjeto(idPessoas, 1L);
-        });
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> projetoService.addMembrosToProjeto(idPessoas, 1L));
 
         assertEquals("Error vinculating Membros to Projeto: No valid employees found in the provided list.", exception.getMessage());
         verify(projetoRepository, never()).save(any(Projeto.class));
@@ -374,7 +381,7 @@ class ProjetoServiceTest {
 
     @Test
     void addMembrosToProjetoProjetoNotFound(){
-        List<Long> idPessoas = Arrays.asList(2L);
+        List<Long> idPessoas = List.of(2L);
 
         Pessoa pessoa = new Pessoa();
         pessoa.setId(2L);
@@ -383,9 +390,7 @@ class ProjetoServiceTest {
         when(pessoaRepository.findAllById(idPessoas)).thenReturn(Collections.singletonList(pessoa));
         when(projetoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        ProjetoNotFoundException exception = assertThrows(ProjetoNotFoundException.class, () -> {
-            projetoService.addMembrosToProjeto(idPessoas, 1L);
-        });
+        ProjetoNotFoundException exception = assertThrows(ProjetoNotFoundException.class, () -> projetoService.addMembrosToProjeto(idPessoas, 1L));
 
         assertNotNull(exception);
         verify(projetoRepository, never()).save(any(Projeto.class));
@@ -393,7 +398,7 @@ class ProjetoServiceTest {
 
     @Test
     void addMembrosToProjetoException(){
-        List<Long> idPessoas = Arrays.asList(2L);
+        List<Long> idPessoas = List.of(2L);
 
         Pessoa pessoa = new Pessoa();
         pessoa.setId(2L);
@@ -407,9 +412,7 @@ class ProjetoServiceTest {
         when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
         when(projetoRepository.save(any(Projeto.class))).thenThrow(new RuntimeException("Database error"));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            projetoService.addMembrosToProjeto(idPessoas, 1L);
-        });
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> projetoService.addMembrosToProjeto(idPessoas, 1L));
 
         assertEquals("Error vinculating Membros to Projeto: Database error", exception.getMessage());
     }
@@ -463,10 +466,126 @@ class ProjetoServiceTest {
         when(pessoaRepository.findAllById(idPessoas)).thenReturn(pessoas);
         when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
 
-        RuntimeException exception = assertThrows(PessoaNotFoundException.class,
+        assertThrows(PessoaNotFoundException.class,
                 () -> projetoService.addMembrosToProjeto(idPessoas, projeto.getId())
         );
 
         verify(projetoRepository, never()).save(any(Projeto.class));
+    }
+
+    //=======================TESTES PARA VERIFICAÇÃO DO isStatusTransitionValid=======================
+    @Test
+    void testValidStatusTransitions() {
+        Long id = 1L;
+        Projeto existingProjeto = new Projeto();
+
+        // Testar todas as transições válidas
+        existingProjeto.setStatus(Status.EM_ANALISE);
+        when(projetoRepository.findById(id)).thenReturn(java.util.Optional.of(existingProjeto));
+        Projeto updatedProjeto = new Projeto();
+
+        // EM_ANALISE -> ANALISE_REALIZADA
+        updatedProjeto.setStatus(Status.ANALISE_REALIZADA);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.ANALISE_REALIZADA, existingProjeto.getStatus());
+
+        // ANALISE_REALIZADA -> ANALISE_APROVADA
+        existingProjeto.setStatus(Status.ANALISE_REALIZADA);
+        updatedProjeto.setStatus(Status.ANALISE_APROVADA);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.ANALISE_APROVADA, existingProjeto.getStatus());
+
+        // ANALISE_REALIZADA -> CANCELADO
+        existingProjeto.setStatus(Status.ANALISE_REALIZADA);
+        updatedProjeto.setStatus(Status.CANCELADO);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.CANCELADO, existingProjeto.getStatus());
+
+        // ANALISE_APROVADA -> INICIADO
+        existingProjeto.setStatus(Status.ANALISE_APROVADA);
+        updatedProjeto.setStatus(Status.INICIADO);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.INICIADO, existingProjeto.getStatus());
+
+        // INICIADO -> PLANEJADO
+        existingProjeto.setStatus(Status.INICIADO);
+        updatedProjeto.setStatus(Status.PLANEJADO);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.PLANEJADO, existingProjeto.getStatus());
+
+        // PLANEJADO -> EM_ANDAMENTO
+        existingProjeto.setStatus(Status.PLANEJADO);
+        updatedProjeto.setStatus(Status.EM_ANDAMENTO);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.EM_ANDAMENTO, existingProjeto.getStatus());
+
+        // EM_ANDAMENTO -> ENCERRADO
+        existingProjeto.setStatus(Status.EM_ANDAMENTO);
+        updatedProjeto.setStatus(Status.ENCERRADO);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.ENCERRADO, existingProjeto.getStatus());
+
+        // EM_ANDAMENTO -> CANCELADO
+        existingProjeto.setStatus(Status.EM_ANDAMENTO);
+        updatedProjeto.setStatus(Status.CANCELADO);
+        assertDoesNotThrow(() -> projetoService.update(updatedProjeto, id));
+        assertEquals(Status.CANCELADO, existingProjeto.getStatus());
+    }
+
+    @Test
+    void isStatusTransitionValidAllFailure() {
+        Long id = 1L;
+        Projeto existingProjeto = new Projeto();
+        Projeto updatedProjeto = new Projeto();
+
+        existingProjeto.setStatus(Status.EM_ANALISE);
+        when(projetoRepository.findById(id)).thenReturn(java.util.Optional.of(existingProjeto));
+
+        // EM_ANALISE -> ANALISE_APROVADA
+        updatedProjeto.setStatus(Status.ANALISE_APROVADA);
+        ValidationException exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: EM_ANALISE -> ANALISE_APROVADA", exception.getMessage());
+
+        // ANALISE_REALIZADA -> INICIADO
+        existingProjeto.setStatus(Status.ANALISE_REALIZADA);
+        updatedProjeto.setStatus(Status.INICIADO);
+        exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: ANALISE_REALIZADA -> INICIADO", exception.getMessage());
+
+        // ANALISE_APROVADA -> EM_ANDAMENTO
+        existingProjeto.setStatus(Status.ANALISE_APROVADA);
+        updatedProjeto.setStatus(Status.EM_ANDAMENTO);
+        exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: ANALISE_APROVADA -> EM_ANDAMENTO", exception.getMessage());
+
+        // INICIADO -> EM_ANDAMENTO
+        existingProjeto.setStatus(Status.INICIADO);
+        updatedProjeto.setStatus(Status.EM_ANDAMENTO);
+        exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: INICIADO -> EM_ANDAMENTO", exception.getMessage());
+
+        // PLANEJADO -> ENCERRADO
+        existingProjeto.setStatus(Status.PLANEJADO);
+        updatedProjeto.setStatus(Status.ENCERRADO);
+        exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: PLANEJADO -> ENCERRADO", exception.getMessage());
+
+        // EM_ANDAMENTO -> ANALISE_APROVADA (inválida)
+        existingProjeto.setStatus(Status.EM_ANDAMENTO);
+        updatedProjeto.setStatus(Status.ANALISE_APROVADA);
+        exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: EM_ANDAMENTO -> ANALISE_APROVADA", exception.getMessage());
+
+        // ENCERRADO -> EM_ANDAMENTO
+        existingProjeto.setStatus(Status.ENCERRADO);
+        updatedProjeto.setStatus(Status.EM_ANDAMENTO);
+        exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: ENCERRADO -> EM_ANDAMENTO", exception.getMessage());
+
+        // CANCELADO -> INICIADO
+        existingProjeto.setStatus(Status.CANCELADO);
+        updatedProjeto.setStatus(Status.INICIADO);
+        exception = assertThrows(ValidationException.class, () -> projetoService.update(updatedProjeto, id));
+        assertEquals("Invalid status transition: CANCELADO -> INICIADO", exception.getMessage());
     }
 }

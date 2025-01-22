@@ -82,18 +82,36 @@ public class ProjetoService {
 
             //Não diz nas regras de negócio passadas pelo escopo, mas deixarei que não pode mudar data de inicio nem a de fim,
             //nem adicionar Membros, já que tem uma função somente para isso.
-            existingProjeto.setNome(projeto.getNome());
-            existingProjeto.setDataPrevisaoFim(projeto.getDataPrevisaoFim());
-            existingProjeto.setOrcamento(projeto.getOrcamento());
-            existingProjeto.setStatus(projeto.getStatus());
-            existingProjeto.setDescricao(projeto.getDescricao());
-            existingProjeto.setGerente(projeto.getGerente());
-            existingProjeto.setRisco(calculateRisco(existingProjeto));
+            if(projeto.getNome() != null) {
+                existingProjeto.setNome(projeto.getNome());
+            }
+            if(projeto.getDataPrevisaoFim() != null) {
+                existingProjeto.setDataPrevisaoFim(projeto.getDataPrevisaoFim());
+            }
+            if(projeto.getOrcamento() != null) {
+                existingProjeto.setOrcamento(projeto.getOrcamento());
+                existingProjeto.setRisco(calculateRisco(existingProjeto));
+            }
+            if(projeto.getStatus() != null) {
+                //fiz uma função de mapeamento em que o Status pode mudar, de acordo com isso, se ele mudar de status para um que
+                //não pode, ele retorna um ValidationException
+                if (!isStatusTransitionValid(existingProjeto.getStatus(), projeto.getStatus())) {
+                    throw new ValidationException("Invalid status transition: "
+                            + existingProjeto.getStatus() + " -> " + projeto.getStatus());
+                }
+                existingProjeto.setStatus(projeto.getStatus());
+            }
+            if(projeto.getDescricao() != null) {
+                existingProjeto.setDescricao(projeto.getDescricao());
+            }
+            if(projeto.getGerente() != null) {
+                existingProjeto.setGerente(projeto.getGerente());
+            }
 
             projetoRepository.save(existingProjeto);
 
             return "Project updated successfully";
-        } catch (ProjetoNotFoundException e){
+        } catch (ProjetoNotFoundException | ValidationException e){
             throw e;
         } catch (Exception e){
             throw new RuntimeException("Error updating project: " + e.getMessage());
@@ -126,7 +144,6 @@ public class ProjetoService {
 
             //retorna erro de pessoa não encontrada por Ids não encontrados
             if (pessoas.size() != idPessoa.size()) {
-                List<Long> foundIds = pessoas.stream().map(Pessoa::getId).toList();
                 throw new PessoaNotFoundException();
             }
 
@@ -162,5 +179,18 @@ public class ProjetoService {
         } else {
             return Risco.BAIXO;
         }
+    }
+
+    private boolean isStatusTransitionValid(Status currentStatus, Status newStatus) {
+        return switch (currentStatus) {
+            case EM_ANALISE -> newStatus == Status.ANALISE_REALIZADA;
+            case ANALISE_REALIZADA -> newStatus == Status.ANALISE_APROVADA || newStatus == Status.CANCELADO;
+            case ANALISE_APROVADA -> newStatus == Status.INICIADO;
+            case INICIADO -> newStatus == Status.PLANEJADO;
+            case PLANEJADO -> newStatus == Status.EM_ANDAMENTO;
+            case EM_ANDAMENTO -> newStatus == Status.ENCERRADO || newStatus == Status.CANCELADO;
+            // Não pode mudar de status depois de encerrado/cancelado
+            case ENCERRADO, CANCELADO -> false;
+        };
     }
 }
