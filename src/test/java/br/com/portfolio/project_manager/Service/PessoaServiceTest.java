@@ -13,6 +13,8 @@ import org.mockito.MockitoAnnotations;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -177,5 +179,73 @@ class PessoaServiceTest {
         RuntimeException thrown = assertThrows(RuntimeException.class, () -> pessoaService.update(updatedPessoa, 1L));
         assertEquals("Error updating person: Database error", thrown.getMessage());
         verify(pessoaRepository, never()).save(updatedPessoa);
+    }
+
+    //=======================TESTES DE CONSULTA=======================
+    @Test
+    void findByIdSuccess(){
+        Pessoa pessoa = new Pessoa();
+        pessoa.setId(1L);
+        pessoa.setNome("Teste");
+        pessoa.setCpf("12345678900");
+        pessoa.setDataNascimento(LocalDate.of(1995, 5, 10));
+        pessoa.setGerente(false);
+        pessoa.setFuncionario(true);
+
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.of(pessoa));
+
+        Pessoa result = pessoaService.findById(1L);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getId());
+        assertEquals("Teste", result.getNome());
+        verify(pessoaRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void findByIdPessoaNotFound() {
+        when(pessoaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(PessoaNotFoundException.class, () -> pessoaService.findById(1L));
+        verify(pessoaRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void findByIdException() {
+        when(pessoaRepository.findById(1L)).thenThrow(new RuntimeException("Database error"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> pessoaService.findById(1L));
+        assertEquals("Error finding person: Database error", exception.getMessage());
+        verify(pessoaRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    public void findAllSuccess() {
+        Pessoa pessoa1 = new Pessoa();
+        pessoa1.setId(1L);
+        pessoa1.setNome("pessoa1");
+
+        Pessoa pessoa2 = new Pessoa();
+        pessoa2.setId(2L);
+        pessoa2.setNome("pessoa2");
+        List<Pessoa> pessoas = Arrays.asList(pessoa1, pessoa2);
+        when(pessoaRepository.findAll()).thenReturn(pessoas);
+
+        List<Pessoa> result = pessoaService.findAll();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.contains(pessoa1));
+        assertTrue(result.contains(pessoa2));
+        verify(pessoaRepository,times(1)).findAll();
+    }
+
+    @Test
+    public void findAllException() {
+        when(pessoaRepository.findAll()).thenThrow(new RuntimeException("Database error"));
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> pessoaService.findAll());
+        assertEquals("Error finding people: Database error", thrown.getMessage());
+        verify(pessoaRepository,times(1)).findAll();
     }
 }

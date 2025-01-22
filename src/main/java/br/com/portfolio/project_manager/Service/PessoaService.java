@@ -63,4 +63,23 @@ public class PessoaService {
             throw new RuntimeException("Error updating person: " + e.getMessage());
         }
     }
+
+    public Pessoa findById(Long id){
+        try{
+            return pessoaRepository.findById(id)
+                    .orElseThrow(PessoaNotFoundException::new);
+        } catch (PessoaNotFoundException e){
+            throw e;
+        } catch (Exception e){
+            throw new RuntimeException("Error finding person: " + e.getMessage());
+        }
+    }
+
+    public List<Pessoa> findAll(){
+        try{
+            return pessoaRepository.findAll();
+        } catch (Exception e){
+            throw new RuntimeException("Error finding people: " + e.getMessage());
+        }
+    }
 }
