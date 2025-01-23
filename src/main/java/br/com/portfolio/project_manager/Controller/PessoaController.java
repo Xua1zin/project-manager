@@ -47,17 +47,25 @@ public class PessoaController {
     public ResponseEntity<String> update(@PathVariable Long id, @RequestBody Pessoa pessoa){
         try{
             return ResponseEntity.ok(pessoaService.update(pessoa, id));
-        } catch (Exception e){
-            return ResponseEntity.badRequest().build();
+        }  catch (PessoaNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Pessoa não encontrada");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro inesperado: " + e.getMessage());
         }
     }
 
     @GetMapping("/findById/{id}")
-    public ResponseEntity<Pessoa> findById(@PathVariable Long id){
+    public ResponseEntity<?> findById(@PathVariable Long id){
         try {
             return ResponseEntity.ok(pessoaService.findById(id));
-        } catch (Exception e){
-            return ResponseEntity.badRequest().build();
+        }  catch (PessoaNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Pessoa não encontrada");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro inesperado: " + e.getMessage());
         }
     }
 
